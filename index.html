@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.5/dist/signature_pad.umd.min.js"></script>
+
+<style>
+body {
+  font-family: Arial;
+  max-width: 600px;
+  margin: 30px auto;
+  padding: 60px 20px 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  position: relative;
+}
+
+.logo {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+.logo img {
+  height: 40px;
+}
+
+input, select, button {
+  width: 100%;
+  margin: 10px 0;
+  padding: 8px;
+}
+
+canvas {
+  width: 100%;
+  height: 200px;
+  border: 1px solid #ccc;
+}
+
+/* FIX CHECKBOX ONLY */
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin: 4px 0;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: auto;
+  margin-left: auto;
+}
+</style>
+</head>
+
+<body>
+
+<div class="logo">
+  <img src="logo-bekaert.png">
+</div>
+
+<h2 style="text-align:center;">Approval Form Packing Material</h2>
+
+<form id="form">
+
+<label>Tanggal</label>
+<input type="date" name="tanggal" required>
+
+  <label>Team</label>
+  <select name="team" required>
+    <option value="">- Pilih -</option>
+    <option value="A">A</option>
+    <option value="B">B</option>
+    <option value="C">C</option>
+    <option value="D">D</option>
+  </select>
+
+  <label>Shift</label>
+  <select name="shift" required>
+    <option value="">- Pilih -</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="NS">NS</option>
+</select>
+
+<label>Disetujui oleh:</label>
+<div class="checkbox-group">
+  <label>Grup Leader <input type="checkbox" name="gl"></label>
+  <label>Team Leader <input type="checkbox" name="tl"></label>
+  <label>Operator Produksi <input type="checkbox" name="op"></label>
+  <label>Operator Warehouse <input type="checkbox" name="ow"></label>
+</div>
+
+<label>Tanda Tangan</label>
+<canvas id="ttd"></canvas>
+<button type="button" onclick="pad.clear()">Clear</button>
+
+<label>Nama</label>
+<input type="text" name="nama" required>
+
+<button type="submit">Submit</button>
+
+</form>
+
+<script>
+const pad = new SignaturePad(document.getElementById("ttd"));
+
+document.getElementById("form").addEventListener("submit", e => {
+  e.preventDefault();
+
+  const f = new FormData(e.target);
+  const data = new FormData();
+
+  data.append("tanggal", f.get("tanggal"));
+  data.append("team", f.get("team"));
+  data.append("shift", f.get("shift"));
+  data.append("nama", f.get("nama"));
+  data.append("gl", f.get("gl") ? "OK" : "-");
+  data.append("tl", f.get("tl") ? "OK" : "-");
+  data.append("op", f.get("op") ? "OK" : "-");
+  data.append("ow", f.get("ow") ? "OK" : "-");
+  data.append("ttd", pad.isEmpty() ? "" : pad.toDataURL());
+
+  fetch("https://script.google.com/macros/s/AKfycbyGs36E-f5CpmfruzYYf2mKsIruGaJw3ofuz0WY-lU_NTZ2IuRfvzNcVoeYPhqYdq6WVg/exec", {
+    method: "POST",
+    mode: "no-cors",
+    body: data
+  });
+
+  alert("✅ Terkirim!");
+  e.target.reset();
+  pad.clear();
+});
+</script>
+
+</body>
+</html>
